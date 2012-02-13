@@ -1,0 +1,14 @@
+<project name="UberCommandPack">
+    
+    <property name="result" value="uber-command-pack" />
+       
+    <import file="../ant/commons.xml" />
+    
+    <target name="jar" depends="jar-setup, jar-classpath, jar-defclasspath"> 
+        <jar destfile="../${plugins}/${result}.jar" basedir="${classes}">
+            <manifest>
+                <attribute name="Class-Path" value="${manifest.classpath}" />
+            </manifest>
+        </jar>
+    </target>
+</project>

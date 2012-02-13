@@ -1,0 +1,91 @@
+<project name="deploy" default="zip">
+    
+    <import file="properties.xml" />
+       
+    <!--
+        Runs the application, using main.class as an entry point.
+    -->
+    <target name="run-application">
+        <java classname="${main.class}" fork="true" classpathref="classpath" 
+            dir=".." />
+    </target>
+            
+    <!--
+        Invokes all subproject's 'clean' targets.
+    -->
+    <target name="clean-all">
+        <subant>
+            <target name="clean" />
+            <fileset dir="..">
+                <include name="**/build.xml" />
+            </fileset>
+        </subant>
+    </target>
+    
+    <!--
+        Invokes all subproject's 'build' targets.
+    -->            
+    <target name="build-all">
+        <subant>
+            <target name="build" />
+            <!-- Need to enforce the order -->
+            <filelist dir="..">
+                <file name="FileSystemAPI/build.xml" />
+                <file name="CommandAPI/build.xml" />
+                <file name="Core/build.xml" />
+                <file name="LocalFS/build.xml" />
+                <file name="GUI/build.xml" />
+                <file name="UberCommandPack/build.xml" />
+            </filelist>
+        </subant>
+    </target>
+
+    <!--
+        Rebuilds whole project.
+    -->
+    <target name="rebuild-all" depends="clean-all, build-all" />
+    
+    <!--
+        Creating .zip file containing all the application files in main 
+        directory. Ignores all the files whose names begin with a period
+        (to rule out eclipse's stuff). Zip is always created from scratch.
+    -->
+    <target name="zip" depends="cleanzip, rebuild-all">
+        <zip destfile="../${zipfile}.zip">
+            <zipfileset dir="../${dist}" prefix="${dist}">
+                <include name="**/*.jar" />
+            </zipfileset>
+            <zipfileset dir="../${resources}" prefix="${resources}">
+                <exclude name="**/.*" />
+            </zipfileset>
+            <zipfileset dir="../${lib}" prefix="${lib}">
+                <exclude name="**/.*" />
+            </zipfileset>
+            <zipfileset dir="../${plugins}" prefix="${plugins}">
+                <include name="**/*.jar" />
+            </zipfileset>
+            <zipfileset dir="../${runscripts}" />
+            <zipfileset dir="..">
+                <include name="*/*.properties" />
+            </zipfileset>
+        </zip>
+    </target>
+
+    <!--
+        Deletes the zip.
+    -->
+    <target name="cleanzip">
+        <delete file="../${zipfile}.zip" />
+    </target>
+    
+    <!--
+        Builds javadoc from all the .java files found in project directory.
+    -->
+    <target name="doc">
+        <mkdir dir="../${doc}"/>
+        <javadoc sourcepath=".." destdir="../${doc}">
+            <fileset dir=".." includes="**/*.java" />
+        </javadoc>
+    </target>
+   
+</project>

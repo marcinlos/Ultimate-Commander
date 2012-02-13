@@ -1,0 +1,15 @@
+<project name="LocalFS">
+    
+    <property name="result" value="local-fs" />
+       
+    <import file="../ant/commons.xml" />
+    
+    <target name="jar" depends="jar-setup, jar-classpath, jar-defclasspath"> 
+        <jar destfile="../${plugins}/${result}.jar" basedir="${classes}">
+            <manifest>
+                <attribute name="Class-Path" value="${manifest.classpath}" />
+            </manifest>
+            <service type="mlos.ultcom.fs.FileFactory" provider="mlos.ultcom.localfs.LocalFileFactory" />
+        </jar>
+    </target>
+</project>

@@ -1,0 +1,96 @@
+<project name="commons" basedir=".">
+    
+    <!-- 
+        Ant resolves files against the including script, so in order to make
+        sure we refer to the same location we need to explicitly save and use
+        this script's base directory.
+    -->
+    <dirname property="commons.dir" file="${ant.file.commons}" />        
+    <property file="${commons.dir}/names.properties" />
+    
+    <!-- 
+        Properties are imported from external file. Seems convinient for now .
+    -->
+    <import file="properties.xml" />
+
+    <!--
+        Deletes whole 'classes' directory, and .jar file created by this 
+        subproject.
+    -->
+    <target name="clean">
+        <delete dir="${classes}" />
+        <delete file="../${dist}/${result}.jar" />
+    </target>
+
+    <!--
+        Compiles all the source files from 'src' directory. Classpath as 
+        defined in properties.xml.
+    -->
+    <target name="compile">
+        <mkdir dir="${classes}" />
+        <javac srcdir="${src}" destdir="${classes}">
+            <classpath refid="classpath" />    
+        </javac>
+    </target>
+    
+    <!--
+        Invoked by build-all target in deploy.xml. By default it runs jar task.
+        Should be overrided when other actions or specific jar creation options
+        (e.g. manifest for service provider). 
+    -->
+    <target name="build" depends="jar" />
+         
+    <!--
+        Creates jar from all compiled classes, and places it in main 'dist'
+        directory. Jar's classpath always contains libres.classpath as
+        defined in properties.xml. If including script defines jar.classpath
+        path (not property!), it is included as well.
+        When overriding this target it's still possible to use
+        manifest.classpath, so custom jar classpaths don't require any
+        additional effort.
+    -->
+    <target name="jar" depends="jar-setup, jar-classpath, jar-defclasspath"> 
+        <jar destfile="${jarfile}" basedir="${classes}">
+            <manifest>
+                <attribute name="Class-Path" value="${manifest.classpath}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <!--
+        Helper task, checks whether jar.customclasspath is defined, makes sure
+        the main 'dist' dir exists and defines the .jar file path. 
+    -->
+    <target name="jar-setup" depends="compile">
+        <mkdir dir="../${dist}" />
+        <property name="jarfile" value="../${dist}/${result}.jar" />
+        <condition property="jar.customclasspath">
+            <isreference refid="jar.classpath" />
+        </condition>
+    </target>
+
+    <!--
+        Helper, sets default jar classpath if no custom path was defined.
+    -->
+    <target name="jar-defclasspath" unless="jar.customclasspath">
+        <manifestclasspath property="manifest.classpath" jarfile="${jarfile}">
+            <classpath refid="libres.classpath" />
+        </manifestclasspath>  
+    </target>
+
+    <!--
+        Helper, sets full jar classpath including the custom jar.classpath
+        if it was defined in including file.
+    -->
+    <target name="jar-classpath" if="jar.customclasspath">
+        <manifestclasspath property="manifest.classpath" jarfile="${jarfile}">
+            <classpath>
+                <path refid="libres.classpath" />
+                <path refid="jar.classpath" />
+            </classpath>
+        </manifestclasspath>
+    </target>
+            
+    <target name="dummy" />
+
+</project>

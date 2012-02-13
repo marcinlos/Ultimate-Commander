@@ -1,0 +1,33 @@
+<project name="properties">
+
+    <!-- 
+        Ant resolves files against the including script, so in order to make
+        sure we refer to the same location we need to explicitly save and use
+        this script's base directory.
+    -->
+    <dirname property="properties.dir" file="${ant.file.properties}" />        
+    <property file="${properties.dir}/names.properties" />
+    
+    <!--
+        Path containing all the jars from 'lib' directory and whole 'resources'
+        directory. Used as default jar's classpath.
+    -->
+    <path id="libres.classpath">
+        <fileset dir="../${lib}" includes="**/*.jar" />
+        <pathelement location=".." />
+    </path>
+    
+    <!--
+        Path containing everything necessary to compile and run the project.
+    -->
+    <path id="classpath">
+        <path refid="libres.classpath" />
+        <fileset dir="../${dist}">
+            <include name="**/*.jar" />
+        </fileset>
+        <fileset dir="../${plugins}">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+   
+</project>

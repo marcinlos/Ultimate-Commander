@@ -1,0 +1,7 @@
+<project name="FileSystemAPI">
+    
+    <property name="result" value="fs-api" />
+       
+    <import file="../ant/commons.xml" />
+    
+</project>

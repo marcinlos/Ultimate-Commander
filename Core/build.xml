@@ -1,0 +1,7 @@
+<project name="Core">
+    
+    <property name="result" value="core" />
+       
+    <import file="../ant/commons.xml" />
+    
+</project>

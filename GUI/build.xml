@@ -1,0 +1,7 @@
+<project name="GUI">
+    
+    <property name="result" value="gui" />
+    
+    <import file="../ant/commons.xml" />
+    
+</project>
